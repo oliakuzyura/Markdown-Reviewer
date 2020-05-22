@@ -1,0 +1,149 @@
+const markdown =
+`# Marked - Markdown Parser
+## My Previewer
+I just love **bold text**.
+> Dorothy followed her through many of the beautiful rooms in her castle.
+* First item
+* Second item
+* Third item
+1.  Open the file.
+2.  Find the following code block on line 21:
+
+        <html>
+          <head>
+            <title>Test</title>
+          </head>
+
+3.  Update the title to match the name of your website.
+
+![Tux, the Linux mascot](https://d2xzmw6cctk25h.cloudfront.net/profession/125/v2_image/small-751721b9205c69dd09943b96f554cd68.png)
+
+enter a code \`nano\`
+
+Here is my link: [Link you can visit](https://tproger.ru/translations/how-css-flexbox-works/)
+`;
+marked.setOptions({
+  breaks: true });
+
+
+const renderer = new marked.Renderer();
+
+renderer.link = function (href, title, text) {
+  return `<a target="_blank" href="${href}">${text}</a>`;
+};
+class App extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      input: markdown,
+      firstExpand: false,
+      secondExpand: false };
+
+    this.handleOnChange = this.handleOnChange.bind(this);
+    this.handleOnFirstExpandClick = this.handleOnFirstExpandClick.bind(this);
+    this.handleOnSecondExpandClick = this.handleOnSecondExpandClick.bind(this);
+  }
+
+  handleOnChange(event) {
+    this.setState({
+      input: event.target.value });
+
+  }
+
+  handleOnFirstExpandClick() {
+    if (this.state.firstExpand) {
+      this.setState(
+
+      {
+        firstExpand: false });
+
+    } else
+    {
+      this.setState(
+
+      {
+        firstExpand: true });
+
+    }
+
+  }
+
+  handleOnSecondExpandClick() {
+    if (this.state.secondExpand) {
+      this.setState(
+
+      {
+        secondExpand: false });
+
+    } else
+    {
+      this.setState(
+
+      {
+        secondExpand: true });
+
+    }
+  }
+
+  render() {
+    const toolEditorBarId = this.state.firstExpand ? 'toolExpand' : this.state.secondExpand ? 'hide' : 'toolNormalFirst';
+    const toolPreviewerBarId = this.state.secondExpand ? 'toolExpand' : this.state.firstExpand ? 'hide' : 'toolNormalSecond';
+    console.log(toolEditorBarId);
+    return (
+      React.createElement("div", { id: "#app" },
+      React.createElement(Toolbar, { onClick: this.handleOnFirstExpandClick, idForToolbar: toolEditorBarId, name: "Editor", width: "600px" }),
+      React.createElement(Editor, { input: this.state.input, expandId: this.state.secondExpand ? `hide` : this.state.firstExpand ? `expandEditor` : `editor`, handleOnChange: this.handleOnChange }),
+      React.createElement(Toolbar, { onClick: this.handleOnSecondExpandClick, idForToolbar: toolPreviewerBarId, name: "Previewer", width: "900px" }),
+      React.createElement(Previewer, { hideId: this.state.firstExpand ? `hide` : this.state.secondExpand ? `expandPreview` : 'preview', input: this.state.input })));
+
+
+
+  }}
+
+
+
+class Editor extends React.Component {
+  constructor(props) {
+    super(props);
+
+  }
+
+  render() {
+    return (
+      React.createElement("div", { className: "editorDiv" },
+      React.createElement("textarea", { id: this.props.expandId, value: this.props.input, onChange: this.props.handleOnChange, type: "text" })));
+
+
+  }}
+
+
+class Toolbar extends React.Component {
+  constructor(props) {
+    super(props);
+  }
+
+  render() {
+    return (
+      React.createElement("div", { className: "toolbar", id: this.props.idForToolbar },
+      React.createElement("strong", { style: { marginLeft: '10px' } }, this.props.name),
+      React.createElement("i", { className: "fas fa-expand-arrows-alt", onClick: this.props.onClick })));
+
+
+
+  }}
+
+
+class Previewer extends React.Component {
+  constructor(props) {
+    super(props);
+  }
+
+  render() {
+    return (
+
+      React.createElement("div", { id: this.props.hideId, dangerouslySetInnerHTML: { __html: marked(this.props.input, { renderer }) } }));
+
+
+  }}
+
+ReactDOM.render(React.createElement(App, null), document.getElementById('app'));
